@@ -1,0 +1,110 @@
+Thank you so much for looking at this.
+Really love your triggering intensifies pic! 😊 You have really made my day!
+
+Happy to sit down with Gill, Carl and yourself and do the chocolatey server properly – would help to get things in place as we’ll need to use it soon to push Richard’s receipt reprint app.
+Lets just setup a meeting.
+
+Thanks!
+
+From: Sam Greatorex <SGreatorex@htec.co.uk> 
+Sent: 12 February 2020 12:02
+To: Marna Strauss <MStrauss@htec.co.uk>
+Subject: RE: ChocoRemote Script - Change: 3555/Release Manager: 6335
+
+ 
+
+The script that’s being run when you do a ‘choco install anpr-api anpr-ui’ is not the same script David is changing. It’s a script that’s embedded in the actual package and just stops the service, backs up the install and then does the upgrade.
+
+In all honesty I’m still perplexed as to why the choco remote script even exists, there’s a lot of code to do not a lot of things.
+
+SO-MSP-APP03 is not permitted to access the chocolatey server. The Choco remote script doesn’t really need to check if the server is up because it’s entirely irrelevant for what it’s doing. Why does the remote install script care if it can’t see the server? Surely the only important thing is that the client can reach the server, and that will be checked and reported by the Chocolatey client itself if it’s down.
+
+There are a lot of issues with this script and I’d like to suggest we try to move away from it if we can and seek alternatives:
+
+•	It’s not particularly well written
+o	There’s variables written to the global scope for no reason instead of just passing them to functions that need them
+o	It uses $args instead of a parameter block that will self-validate arguments like upgrade, install etc
+o	Function names don’t follow proper naming conventions
+•	It’s slow because it loops through the list of sites one-by-one instead of just letting PowerShell do it asynchronously
+o	You can feed as many hostnames/ips to -ComputerName in Invoke-Command as you want and PowerShell will batch them all up and do some of them at the same time
+•	It asks for your credentials for no reason and doesn’t verify them so if you typo your password you’re ripe to lock your account out when it tries to logon to hundreds of machines
+o	You don’t need to provide a credential object to Invoke-Command, it will just use the current users logon token if you don’t
+
+You could more or less do the same thing the script is doing quicker and more efficiently by just running:
+
+Invoke-Command -ComputerName ASDA9998ANPR.asd.msp.htec.co.uk, ASDA9999ANPR.asd.msp.htec.co.uk -ScriptBlock {
+    choco upgrade anpr-api -y
+    $apiExitCode = $LASTEXITCODE
+    
+    choco upgrade anpr-ui -y
+    $uiExitCode = $LASTEXITCODE
+
+    [PSCustomObject]@{
+        APIExitCode = $apiExitCode;
+        UIExitCode = $uiExitCode;
+    }
+} | Select-Object PSComputerName, APIExitCode, UIExitCode | ConvertTo-Csv -NoTypeInformation | Tee-Object C:\Scripts\ASDA\Choco\Logs\installs.csv | ConvertFrom-Csv
+
+And any that return anything other than 0 in the exit codes didn’t work and we can use Zabbix to monitor the Chocolatey client log.
+
+Honestly I’m really annoyed with how we’ve handled this whole Chocolatey thing, it’s been totally mismanaged and has meant we’re doing everything ass-backwards but hey, hopefully if we can get together with Carl and Gill we can nip this in the bud… Rant over.
+
+Sam
+
+From: Marna Strauss <MStrauss@htec.co.uk> 
+Sent: 12 February 2020 10:22
+To: Sam Greatorex <SGreatorex@htec.co.uk>
+Subject: ChocoRemote Script - Change: 3555/Release Manager: 6335
+
+Morning Sam,
+
+How you doing? Please have a little read and lemme know what you think is going wrong?
+
+From our chat yesterday…
+
+I’ve tried choco install anpr-api anpr-ui from ASDA9998ANPR  it then asks to run the choco script which David setup (this is the one I need to test)
+If I say Yes (see below) the install works perfectly once you type “y”
+
+ 
+
+PO-MSP-APP03 or SO-MSP-APP03
+
+If I try to do the install from PO-MSP-APP03 or SO-MSP-APP03 using the choco remote install script (attached) – this is how we install to large number of sites on the Estate, I cannot connect to 9998.
+ 
+
+Can you please advise? It normally works from SO-MSP-APP03 – that’s where we push the packages to the Estate. 
+I’ve launched cmd prompt as administrator and tried, but its not that.
+
+ 
+
+Changes to the new choco remote install script:
+
+A few improvements to the ChocoRemote script
+Report and error if the Choco server is down or unreachable
+Do a fresh log each day, appending the date to the filename
+Add a summary log of outcomes per site
+Add option to upgrade either API or UI or both
+Install option can also set the server source to save rebooting twice
+
+Please advise?
+
+ 
+	Marna Marie' Strauss 
+Operational Security Analyst
+
+   mstrauss@htec.co.uk 
+
+
+www.htec.co.uk 
+	
+ 
+ 
+ 
+	
+		
+This email is confidential, may be legally privileged, and is solely for the use of the intended recipient. Access, disclosure, copying, distribution, or reliance on any of it by anyone else is prohibited and may be a criminal offence. If you have received this e-mail by mistake, please notify the sender immediately by e-mail and delete this e-mail from your system. The sender has taken reasonable precautions to ensure no viruses are present in this e-mail however the company cannot accept responsibility for any loss or damage arising from the use of this e-mail or attachments. Please note that this e-mail has been created in the knowledge that Internet e-mail is not a 100% secure communications medium. We advise that you understand and consider this lack of security when e-mailing us. 
+
+HTEC Limited is a company registered in England and Wales, company registration number 1486255. Registered office address George Curl Way, Southampton, Hampshire, SO18 2RX, United Kingdom. HTEC Limited is a wholly owned subsidiary of Universe Group plc, a company registered in England and Wales, company registration number 2639726. Registered office address George Curl Way, Southampton, Hampshire, SO18 2RX, United Kingdom. 
+				
+
+

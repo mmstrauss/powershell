@@ -1,0 +1,16 @@
+  fileType               = 'MSI'
+  url                    = 'https://dl.google.com/tag/s/dl/chrome/install/googlechromestandaloneenterprise.msi'
+  url64bit               = 'https://dl.google.com/tag/s/dl/chrome/install/googlechromestandaloneenterprise64.msi'
+  checksum               = 'a0a2475f698941b749f72d12a540b1c98f32b6e7c1867b3a5897a6cd32c438a8'
+  checksum64             = 'a03e83bc1861ea00e03ea68887edc6a90a817b546e2ab2f111c4f790af9b2dc2'
+  checksumType           = 'sha256'
+  checksumType64         = 'sha256'
+  silentArgs             = "/quiet /norestart /l*v `"$($env:TEMP)\$($env:chocolateyPackageName).$($env:chocolateyPackageVersion).MsiInstall.log`""
+  validExitCodes         = @(0)
+}
+
+https://community.chocolatey.org/packages/GoogleChrome#discussion
+
+Remediation for CVE-2021-44228
+
+

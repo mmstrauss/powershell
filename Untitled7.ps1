@@ -1,0 +1,1 @@
+﻿Get-ItemProperty "HKLM:\SOFTWARE\Classes\http\shell\open\command" | Select-Object -ExpandProperty "(default)" 

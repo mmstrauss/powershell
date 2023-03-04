@@ -1,0 +1,1 @@
+﻿Get-Content c:\windows\temp\ra-agent-install.log | Select-String "Installation success or error status:"

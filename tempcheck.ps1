@@ -1,0 +1,1 @@
+﻿(Get-WmiObject MSAcpi_ThermalZoneTemperature -Namespace "root/wmi" | Select-Object -ExpandProperty CurrentTemperature) / 10 - 273.15

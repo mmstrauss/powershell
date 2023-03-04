@@ -1,0 +1,23 @@
+$s = "bits", "wuausrv", "cryptsvc"
+stop-service $s
+
+Get-Eventlog System -EntryType Error -Newest 1000
+Get-WinEvent -LogName Security -MaxEvents 5
+Get-WinEvent -LogName Security -Newest 5
+Get-Eventlog -LogName Security - Newest 5 | Format-List *
+
+Get-Service -DisplayName "*datase*", "*hydraf*", "*esoc*" |Restart-service -force
+$htecservices = get-service esprun, datasender5, HydraFileSendService
+if ($A.Status -eq "Stopped") {$A.start()} elseIf ($A.status -eq "Running") {Write-Host -ForegroundColor Yellow $A.name "is running"}
+
+Get-Process -Name VeederRootDIMHost,Unmannedpseudopos,hydraemvopt,javaw,pumpcontroler | Start-Process
+Get-Process -Name VeederRootDIMHost,Unmannedpseudopos,hydraemvopt,javaw,pumpcontroler | Stop-Process -Force
+Get-Process -Name VeederRootDIMHost,Unmannedpseudopos,hydraemvopt,javaw,pumpcontroler | Format-List * 
+
+
+Get-Service | where {$_.DisplayName -like "*ESET*"}
+
+Get-Service | where {$_.DisplayName -like "*htec*"}
+
+Get-Service | where {$_.Status -eq "Stopped"} |more
+

@@ -1,0 +1,7 @@
+
+$a = .\msiinv.exe -s | Select-String "SQL Server" -Context 0,1
+$a = $a -replace ">", "rem";
+$a = $a -replace "\t", "";
+$a = $a -replace "Product code:","msiexec /x """;
+$a | Out-File c:\temp\remove.bat -encoding ascii;
+.\Remove.bat

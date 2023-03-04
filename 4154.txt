@@ -1,0 +1,377 @@
+
+!
+! Last configuration change at 23:38:59 UTC Mon Jan 24 2022 by zack.meissner
+! NVRAM config last updated at 23:39:01 UTC Mon Jan 24 2022 by zack.meissner
+!
+version 17.2
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service internal
+service sequence-numbers
+service call-home
+platform qfp utilization monitor load 80
+no platform punt-keepalive disable-kernel-core
+platform hardware throughput crypto 50000
+!
+hostname HTEC-ASDA-4154-Slough
+!
+boot-start-marker
+boot-end-marker
+!
+!
+logging buffered 65535
+logging console critical
+enable secret 8 $8$1xaNFmW2gM2ImU$QBdG4QrUx9fClhp1R/.eJNaE8xE/Kzp5Jz3GmeiI.fU
+!
+aaa new-model
+!
+!
+aaa group server tacacs+ timico-tacacs
+ server name timico-tacacs
+!
+aaa authentication login default group timico-tacacs local
+aaa authentication enable default group timico-tacacs enable
+aaa authorization commands 1 default group timico-tacacs local 
+aaa authorization commands 5 default group timico-tacacs local 
+aaa authorization commands 7 default group timico-tacacs local 
+aaa authorization commands 15 default none 
+aaa accounting exec default start-stop group timico-tacacs
+aaa accounting commands 1 default start-stop group timico-tacacs
+aaa accounting commands 5 default start-stop group timico-tacacs
+aaa accounting commands 7 default start-stop group timico-tacacs
+aaa accounting commands 15 default start-stop group timico-tacacs
+aaa accounting network default start-stop group timico-tacacs
+aaa accounting connection default start-stop group timico-tacacs
+aaa accounting system default start-stop group timico-tacacs
+no aaa accounting system guarantee-first
+!
+!
+!
+!
+!
+!
+aaa session-id common
+clock summer-time BST recurring last Sun Mar 2:00 last Sun Oct 2:00
+!
+!
+!
+no ip domain lookup
+ip domain name timico.dsl.uk
+!
+!
+!
+login block-for 1800 attempts 6 within 120
+login on-failure log
+login on-success log
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+multilink bundle-name authenticated
+!
+chat-script lte "" "AT!CALL" TIMEOUT 20 "OK"
+!
+!
+crypto pki trustpoint TP-self-signed-1933674408
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-1933674408
+ revocation-check none
+ rsakeypair TP-self-signed-1933674408
+!
+crypto pki trustpoint SLA-TrustPoint
+ enrollment pkcs12
+ revocation-check crl
+!
+crypto pki trustpoint TP-self-signed-3539650276
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-3539650276
+ revocation-check none
+ rsakeypair TP-self-signed-3539650276
+!
+!
+crypto pki certificate chain TP-self-signed-1933674408
+ certificate self-signed 01
+  30820330 30820218 A0030201 02020101 300D0609 2A864886 F70D0101 05050030 
+  31312F30 2D060355 04031326 494F532D 53656C66 2D536967 6E65642D 43657274 
+  69666963 6174652D 31393333 36373434 3038301E 170D3232 30313234 32303135 
+  31345A17 0D333030 31303130 30303030 305A3031 312F302D 06035504 03132649 
+  4F532D53 656C662D 5369676E 65642D43 65727469 66696361 74652D31 39333336 
+  37343430 38308201 22300D06 092A8648 86F70D01 01010500 0382010F 00308201 
+  0A028201 0100B13A 4E99F774 1862C3E8 179F5494 F12C0B2F 6D09F0CA B0C6C77F 
+  F72E59DD A4698740 A23D31E6 B6403F17 AFB225DE 6CA9C47A 062CE2AA D9DE0925 
+  DC300503 2EA00A4D C9439BCE 6F985A77 349656AD 04B0D298 9D9CE9BB 87FECFCD 
+  853A8A06 7CA9B5F8 B1F54982 DA4FEA0D AC0B546C BEE8A4E8 3437EC59 9D5596E7 
+  14209FF9 3C6182B7 9A9DD8C1 EB4AD4F1 054C2135 586439A5 4530E6D4 576EAE58 
+  7B2769E0 1EF03020 8EDAA07A B42798C2 6DB97298 3A914F0A EE59E291 B0665013 
+  38B814C4 A3CCA4D1 47736DA5 893BE19E 40042C9B 1008DD09 9E1A9C2E D1E5E045 
+  8405FAC0 E3E08A41 342EE0F7 E982670C DF32E095 5BE32A79 0944A098 ECC14F45 
+  071B9B4C 4C4F0203 010001A3 53305130 0F060355 1D130101 FF040530 030101FF 
+  301F0603 551D2304 18301680 14C612DE 43AAEBE3 0EA60E05 B2DC30AD B6811B38 
+  56301D06 03551D0E 04160414 C612DE43 AAEBE30E A60E05B2 DC30ADB6 811B3856 
+  300D0609 2A864886 F70D0101 05050003 82010100 A90EF976 22341AE7 868EF557 
+  9EEDE71F 5E547DEE 21510C75 4D0D44EE 367C8C06 7FBEB5C5 D397FCA4 0E39ECF6 
+  01F5709C 4AAD89F6 AA993725 107F0F3C 3FF94550 5DDFE15C 9E1F3AA6 108C3E7F 
+  8122DC08 36EDE214 D6B7B708 A8F213A9 2F08AF4A 84EB8647 279E139F E8EE36E3 
+  56C247BC 5E9B60E0 BC60927B 516CEC16 12742065 8B1746FB FB9AB0A1 D9EEE268 
+  0D47DEF1 9D31196D 4D52553B 376BBF6E 32F4DD67 FDB0BDF4 DF22DDFD 0EF40410 
+  A8189865 4E73A97E 45732435 088AA18F C2D1AE56 0701112F 8A13AEDF F033E228 
+  1592DB0E 8CF02789 0554F6AC 15DB0186 3EE36FE7 0C8CE78C DB229283 2398EFE7 
+  39018765 4E74A791 0E2205D6 19CE2F8F F4009471
+  	quit
+crypto pki certificate chain SLA-TrustPoint
+ certificate ca 01
+  30820321 30820209 A0030201 02020101 300D0609 2A864886 F70D0101 0B050030 
+  32310E30 0C060355 040A1305 43697363 6F312030 1E060355 04031317 43697363 
+  6F204C69 63656E73 696E6720 526F6F74 20434130 1E170D31 33303533 30313934 
+  3834375A 170D3338 30353330 31393438 34375A30 32310E30 0C060355 040A1305 
+  43697363 6F312030 1E060355 04031317 43697363 6F204C69 63656E73 696E6720 
+  526F6F74 20434130 82012230 0D06092A 864886F7 0D010101 05000382 010F0030 
+  82010A02 82010100 A6BCBD96 131E05F7 145EA72C 2CD686E6 17222EA1 F1EFF64D 
+  CBB4C798 212AA147 C655D8D7 9471380D 8711441E 1AAF071A 9CAE6388 8A38E520 
+  1C394D78 462EF239 C659F715 B98C0A59 5BBB5CBD 0CFEBEA3 700A8BF7 D8F256EE 
+  4AA4E80D DB6FD1C9 60B1FD18 FFC69C96 6FA68957 A2617DE7 104FDC5F EA2956AC 
+  7390A3EB 2B5436AD C847A2C5 DAB553EB 69A9A535 58E9F3E3 C0BD23CF 58BD7188 
+  68E69491 20F320E7 948E71D7 AE3BCC84 F10684C7 4BC8E00F 539BA42B 42C68BB7 
+  C7479096 B4CB2D62 EA2F505D C7B062A4 6811D95B E8250FC4 5D5D5FB8 8F27D191 
+  C55F0D76 61F9A4CD 3D992327 A8BB03BD 4E6D7069 7CBADF8B DF5F4368 95135E44 
+  DFC7C6CF 04DD7FD1 02030100 01A34230 40300E06 03551D0F 0101FF04 04030201 
+  06300F06 03551D13 0101FF04 05300301 01FF301D 0603551D 0E041604 1449DC85 
+  4B3D31E5 1B3E6A17 606AF333 3D3B4C73 E8300D06 092A8648 86F70D01 010B0500 
+  03820101 00507F24 D3932A66 86025D9F E838AE5C 6D4DF6B0 49631C78 240DA905 
+  604EDCDE FF4FED2B 77FC460E CD636FDB DD44681E 3A5673AB 9093D3B1 6C9E3D8B 
+  D98987BF E40CBD9E 1AECA0C2 2189BB5C 8FA85686 CD98B646 5575B146 8DFC66A8 
+  467A3DF4 4D565700 6ADF0F0D CF835015 3C04FF7C 21E878AC 11BA9CD2 55A9232C 
+  7CA7B7E6 C1AF74F6 152E99B7 B1FCF9BB E973DE7F 5BDDEB86 C71E3B49 1765308B 
+  5FB0DA06 B92AFE7F 494E8A9E 07B85737 F3A58BE1 1A48A229 C37C1E69 39F08678 
+  80DDCD16 D6BACECA EEBC7CF9 8428787B 35202CDC 60E4616A B623CDBD 230E3AFB 
+  418616A9 4093E049 4D10AB75 27E86F73 932E35B5 8862FDAE 0275156F 719BB2F0 
+  D697DF7F 28
+  	quit
+crypto pki certificate chain TP-self-signed-3539650276
+!
+cts logging verbose
+!
+license udi pid C1117-4PLTEEA sn FCZ2423C1DA
+archive
+ log config
+  logging enable
+  logging size 500
+  notify syslog contenttype plaintext
+memory free low-watermark processor 71090
+!
+diagnostic bootup level minimal
+!
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+controller Cellular 0/2/0
+!
+controller VDSL 0/3/0
+!
+!
+vlan internal allocation policy ascending
+!
+track 1 ip route 10.141.210.14 255.255.255.255 reachability
+!
+!
+buffers tune automatic
+!
+!
+!
+!
+interface GigabitEthernet0/0/0
+ no ip address
+ shutdown
+ negotiation auto
+!
+interface GigabitEthernet0/1/0
+ description +++ Link to Customer Switch +++
+!
+interface GigabitEthernet0/1/1
+ description +++ Spare +++
+!
+interface GigabitEthernet0/1/2
+ description +++ SHUTDOWN +++
+ shutdown
+!
+interface GigabitEthernet0/1/3
+ description +++ SHUTDOWN +++
+ shutdown
+!
+interface Cellular0/2/0
+ ip address negotiated
+ load-interval 30
+ dialer in-band
+ dialer idle-timeout 0
+ dialer-group 2
+ ipv6 enable
+ pulse-time 1
+ ip virtual-reassembly
+!
+interface Cellular0/2/1
+ no ip address
+ shutdown
+!
+interface ATM0/3/0
+ description +++ 01753528750 +++
+ no ip address
+ load-interval 30
+ no atm oversubscribe
+ no atm ilmi-keepalive
+!
+interface ATM0/3/0.1 point-to-point
+ pvc 0/38 
+  encapsulation aal5mux ppp dialer
+  dialer pool-member 1
+ !
+!
+interface Ethernet0/3/0
+ no ip address
+ no negotiation auto
+!
+interface Ethernet0/3/0.101
+ encapsulation dot1Q 101
+ pppoe enable group global
+ pppoe-client dial-pool-number 1
+!
+interface Vlan1
+ description +++ LAN +++
+ ip address 172.17.162.126 255.255.255.192
+ no ip redirects
+ no ip proxy-arp
+ ip virtual-reassembly
+!
+interface Dialer0
+ description +++ TIMICO DSL +++
+ ip address negotiated
+ encapsulation ppp
+ dialer pool 1
+ dialer idle-timeout 0
+ dialer persistent
+ dialer-group 1
+ no cdp enable
+ ppp authentication chap pap callin
+ ppp chap hostname htec.asda.4154@timico.dsl.uk
+ ppp chap password 0 n9mgfbbq
+!
+ip forward-protocol nd
+ip tcp path-mtu-discovery
+no ip http server
+ip http authentication local
+no ip http secure-server
+ip tftp source-interface Vlan1
+ip route 0.0.0.0 0.0.0.0 Dialer0 track 1
+ip route 0.0.0.0 0.0.0.0 Cellular0/2/0 250
+ip ssh time-out 15
+ip ssh version 2
+!
+!
+ip access-list extended INSIDE-TO-OUTSIDE-ACL
+ 10 permit ip 172.17.0.0 0.0.255.255 192.168.21.192 0.0.0.31
+ 20 permit ip 172.17.0.0 0.0.255.255 192.168.21.224 0.0.0.31
+ 30 permit ip 172.17.0.0 0.0.255.255 host 192.168.200.252
+ 40 permit ip 172.17.0.0 0.0.255.255 host 192.168.200.254
+ 50 permit ip 172.17.0.0 0.0.255.255 host 192.168.200.241
+ 60 permit ip 172.17.0.0 0.0.255.255 host 192.168.200.246
+ 70 permit ip 172.17.0.0 0.0.255.255 192.168.105.0 0.0.0.255
+ 80 permit ip 172.17.0.0 0.0.255.255 192.168.106.0 0.0.0.255
+ 90 permit ip 172.17.0.0 0.0.255.255 192.168.107.0 0.0.0.255
+ 100 permit ip 172.17.0.0 0.0.255.255 192.168.108.0 0.0.0.255
+ 110 deny   ip any any
+ip access-list extended OUTSIDE-TO-INSIDE-ACL
+ 10 permit ip 192.168.105.0 0.0.0.255 172.17.0.0 0.0.255.255
+ 20 permit ip 192.168.106.0 0.0.0.255 172.17.0.0 0.0.255.255
+ 30 permit ip 192.168.107.0 0.0.0.255 172.17.0.0 0.0.255.255
+ 40 permit ip 192.168.108.0 0.0.0.255 172.17.0.0 0.0.255.255
+ 50 deny   ip any any
+ip access-list extended OUTSIDE-TO-ROUTER-ACL
+ 10 remark Timico-FortiGates
+ 10 permit ip host 10.141.206.252 any
+ 20 permit ip host 10.141.206.244 any
+ 30 remark Timico-Monitoring
+ 30 permit ip host 10.140.254.53 any
+ 40 remark HTEC-NetworkConfigManager
+ 40 permit ip host 192.168.106.52 any
+ 50 permit icmp host 192.168.105.53 any
+ 60 deny   ip any any
+ip access-list extended ROUTER-TO-OUTSIDE-ACL
+ 10 remark Timico-TACACS
+ 10 permit ip any host 10.140.254.200
+ 20 remark Timico-Monitoring
+ 20 permit ip any host 10.140.254.53
+ 30 remark HTEC
+ 30 permit ip any 192.168.21.192 0.0.0.31
+ 40 permit ip any 192.168.21.224 0.0.0.31
+ 50 permit ip any host 192.168.200.252
+ 60 permit ip any host 192.168.200.254
+ 70 permit ip any host 192.168.200.241
+ 80 permit ip any host 192.168.200.246
+ 90 deny   ip any any
+!
+logging trap notifications
+logging source-interface Dialer0
+logging host 192.168.21.205
+logging host 192.168.21.238
+dialer-list 1 protocol ip permit
+dialer-list 2 protocol ip permit
+!
+!
+snmp-server group timico v3 priv read timico 
+snmp-server view timico iso included
+snmp-server location ASDA Fuel, Telford Dr, Slough SL1 9DU
+snmp-server contact 01753524017 Monday to Sunday 0700 - 2200
+snmp-server enable traps snmp authentication linkdown linkup coldstart warmstart
+snmp-server enable traps tty
+snmp-server enable traps config-copy
+snmp-server enable traps config
+snmp-server enable traps config-ctid
+snmp-server enable traps entity
+snmp-server enable traps cpu threshold
+snmp-server enable traps syslog
+snmp ifmib ifindex persist
+!
+tacacs server timico-tacacs
+ address ipv4 10.140.254.200
+ key FleafDunboCigejRes9Ryeksers
+ timeout 15
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 120 0
+ logging synchronous
+ transport input none
+ stopbits 1
+line vty 0 4
+ exec-timeout 120 0
+ logging synchronous
+ transport input ssh
+!
+call-home
+ ! If contact email address in call-home is configured as sch-smart-licensing@cisco.com
+ ! the email address configured in Cisco Smart License Portal will be used as contact email address to send SCH notifications.
+ contact-email-addr sch-smart-licensing@cisco.com
+ profile "CiscoTAC-1"
+  active
+  destination transport-method http
+ntp source Dialer0
+ntp server 192.168.21.202
+ntp server 192.168.21.234
+!
+!
+!
+!
+!
+end

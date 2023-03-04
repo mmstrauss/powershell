@@ -1,0 +1,400 @@
+
+
+!
+! Last configuration change at 14:18:30 UTC Thu Mar 18 2021 by andy.ellis
+! NVRAM config last updated at 14:18:32 UTC Thu Mar 18 2021 by andy.ellis
+!
+version 16.9
+no service pad
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service internal
+service sequence-numbers
+platform qfp utilization monitor load 80
+no platform punt-keepalive disable-kernel-core
+!
+hostname HTEC-ASDA-4127-Bolton-Secondary
+!
+boot-start-marker
+boot system flash c1100-universalk9_ias.16.09.06.SPA.bin
+boot-end-marker
+!
+!
+logging buffered 65535
+logging console critical
+enable secret 8 $8$Ap6Pm7gvwwPBl.$NWr4Ple84mO74o1jRe8xJziItcm7fXhJKriKqcLmYDQ
+!
+aaa new-model
+!
+!
+aaa group server tacacs+ timico-tacacs
+ server name timico-tacacs
+!
+aaa authentication login default group timico-tacacs local
+aaa authentication enable default group timico-tacacs enable
+aaa authorization commands 1 default group timico-tacacs local 
+aaa authorization commands 5 default group timico-tacacs local 
+aaa authorization commands 7 default group timico-tacacs local 
+aaa authorization commands 15 default none 
+aaa accounting exec default start-stop group timico-tacacs
+aaa accounting commands 1 default start-stop group timico-tacacs
+aaa accounting commands 5 default start-stop group timico-tacacs
+aaa accounting commands 7 default start-stop group timico-tacacs
+aaa accounting commands 15 default start-stop group timico-tacacs
+aaa accounting network default start-stop group timico-tacacs
+aaa accounting connection default start-stop group timico-tacacs
+aaa accounting system default start-stop group timico-tacacs
+no aaa accounting system guarantee-first
+!
+!
+!
+!
+!
+!
+aaa session-id common
+clock summer-time BST recurring last Sun Mar 2:00 last Sun Oct 2:00
+no ip source-route
+!
+!
+!
+no ip domain lookup
+ip domain name timico.dsl.uk
+!
+!
+!
+login block-for 1800 attempts 6 within 120
+login on-failure log
+login on-success log
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+! 
+! 
+! 
+! 
+!
+!
+!
+multilink bundle-name authenticated
+!
+chat-script lte "" "AT!CALL" TIMEOUT 20 "OK"
+!
+!
+crypto pki trustpoint TP-self-signed-3051186655
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-3051186655
+ revocation-check none
+ rsakeypair TP-self-signed-3051186655
+!
+!
+crypto pki certificate chain TP-self-signed-3051186655
+ certificate self-signed 01 nvram:IOS-Self-Sig#1.cer
+!
+cts logging verbose
+license udi pid C1117-4PLTEEA sn FCZ2332C1NP
+no license smart enable
+archive
+ log config
+  logging enable
+  logging size 500
+  notify syslog contenttype plaintext
+  hidekeys
+!
+diagnostic bootup level minimal
+!
+spanning-tree extend system-id
+!
+!
+username tadmin privilege 0 secret 8 $8$jvHHXPngV/0Z2k$srJ.VjoTagp4CWRG9bzJxJW.cpHN6FvYeE3FoB/ZBr6
+!
+redundancy
+ mode none
+!
+!
+!
+!
+controller Cellular 0/2/0
+ lte sim data-profile 1 attach-profile 1 slot 0
+ lte modem link-recovery rssi onset-threshold -110
+ lte modem link-recovery monitor-timer 20
+ lte modem link-recovery wait-timer 10
+ lte modem link-recovery debounce-count 6
+!
+controller VDSL 0/3/0
+!
+!
+vlan internal allocation policy ascending
+!
+track 1 ip route 10.141.207.56 255.255.255.255 reachability
+!
+!
+class-map type inspect match-any OUTSIDE-TO-ROUTER-CLASS
+ match access-group name OUTSIDE-TO-ROUTER-ACL
+class-map type inspect match-any ROUTER-TO-OUTSIDE-CLASS
+ match access-group name ROUTER-TO-OUTSIDE-ACL
+class-map type inspect match-any INSIDE-TO-OUTSIDE-CLASS
+ match access-group name INSIDE-TO-OUTSIDE-ACL
+class-map type inspect match-any OUTSIDE-TO-INSIDE-CLASS
+ match access-group name OUTSIDE-TO-INSIDE-ACL
+!
+policy-map type inspect OUTSIDE-TO-ROUTER-POLICY
+ class type inspect OUTSIDE-TO-ROUTER-CLASS
+  inspect
+ class class-default
+  drop log
+policy-map type inspect INSIDE-TO-OUTSIDE-POLICY
+ class type inspect INSIDE-TO-OUTSIDE-CLASS
+  inspect
+ class class-default
+  drop log
+policy-map type inspect ROUTER-TO-OUTSIDE-POLICY
+ class type inspect ROUTER-TO-OUTSIDE-CLASS
+  inspect
+ class class-default
+  drop log
+policy-map type inspect OUTSIDE-TO-INSIDE-POLICY
+ class type inspect OUTSIDE-TO-INSIDE-CLASS
+  inspect
+ class class-default
+  drop log
+!
+zone security ASDA_PFS
+zone security TIMICO
+zone-pair security INSIDE-TO-OUTSIDE source ASDA_PFS destination TIMICO
+ service-policy type inspect INSIDE-TO-OUTSIDE-POLICY
+zone-pair security OUTSIDE-TO-INSIDE source TIMICO destination ASDA_PFS
+ service-policy type inspect OUTSIDE-TO-INSIDE-POLICY
+zone-pair security OUTSIDE-TO-ROUTER source TIMICO destination self
+ service-policy type inspect OUTSIDE-TO-ROUTER-POLICY
+zone-pair security ROUTER-TO-OUTSIDE source self destination TIMICO
+ service-policy type inspect ROUTER-TO-OUTSIDE-POLICY
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+buffers tune automatic
+!
+!
+! 
+! 
+!
+!
+interface GigabitEthernet0/0/0
+ no ip address
+ shutdown
+ negotiation auto
+!
+interface GigabitEthernet0/1/0
+ description +++ Link to customer switch +++
+!
+interface GigabitEthernet0/1/1
+ shutdown
+!
+interface GigabitEthernet0/1/2
+ shutdown
+!
+interface GigabitEthernet0/1/3
+ shutdown
+!
+interface Cellular0/2/0
+ ip address negotiated
+ zone-member security TIMICO
+ load-interval 30
+ dialer in-band
+ dialer idle-timeout 0
+ dialer-group 2
+ pulse-time 1
+ ip virtual-reassembly
+!
+interface Cellular0/2/1
+ no ip address
+ shutdown
+!
+interface ATM0/3/0
+ description +++ [DSLphone number off nosp] +++
+ no ip address
+ load-interval 30
+ no atm oversubscribe
+ no atm ilmi-keepalive
+ no atm enable-ilmi-trap
+!
+interface ATM0/3/0.1 point-to-point
+ no atm enable-ilmi-trap
+ pvc 0/38 
+  encapsulation aal5mux ppp dialer
+  dialer pool-member 1
+ !
+!
+interface Ethernet0/3/0
+ no ip address
+ no negotiation auto
+!
+interface Ethernet0/3/0.101
+ encapsulation dot1Q 101
+ pppoe enable group global
+ pppoe-client dial-pool-number 1
+!
+interface Vlan1
+ description +++ LAN +++
+ ip address 172.17.0.123 255.255.255.192
+ no ip redirects
+ no ip proxy-arp
+ zone-member security ASDA_PFS
+ standby delay minimum 30 reload 60
+ standby 1 ip 172.17.0.126
+ standby 1 preempt
+ standby 1 name LAN
+ ip virtual-reassembly
+!
+interface Dialer0
+ description +++ TIMICO DSL +++
+ ip address negotiated
+ zone-member security TIMICO
+ encapsulation ppp
+ dialer pool 1
+ dialer idle-timeout 0
+ dialer persistent
+ dialer-group 1
+ no cdp enable
+ ppp authentication chap pap callin
+ ppp chap hostname htec.asda.4127.failover@timico.dsl.uk
+ ppp chap password 0 jne4nkrn
+!
+ip forward-protocol nd
+ip tcp path-mtu-discovery
+no ip http server
+no ip http secure-server
+ip tftp source-interface Vlan1
+ip route 0.0.0.0 0.0.0.0 Dialer0 track 1
+ip route 0.0.0.0 0.0.0.0 Cellular0/2/0 250
+ip ssh time-out 15
+ip ssh version 2
+!
+!
+ip access-list extended INSIDE-TO-OUTSIDE-ACL
+ permit ip 172.17.0.0 0.0.255.255 192.168.21.192 0.0.0.31
+ permit ip 172.17.0.0 0.0.255.255 192.168.21.224 0.0.0.31
+ permit ip 172.17.0.0 0.0.255.255 host 192.168.200.252
+ permit ip 172.17.0.0 0.0.255.255 host 192.168.200.254
+ permit ip 172.17.0.0 0.0.255.255 host 192.168.200.241
+ permit ip 172.17.0.0 0.0.255.255 host 192.168.200.246
+ permit ip 172.17.0.0 0.0.255.255 192.168.105.0 0.0.0.255
+ permit ip 172.17.0.0 0.0.255.255 192.168.106.0 0.0.0.255
+ permit ip 172.17.0.0 0.0.255.255 192.168.107.0 0.0.0.255
+ permit ip 172.17.0.0 0.0.255.255 192.168.108.0 0.0.0.255
+ deny   ip any any
+ip access-list extended OUTSIDE-TO-INSIDE-ACL
+ permit ip 192.168.105.0 0.0.0.255 172.17.0.0 0.0.255.255
+ permit ip 192.168.106.0 0.0.0.255 172.17.0.0 0.0.255.255
+ permit ip 192.168.107.0 0.0.0.255 172.17.0.0 0.0.255.255
+ permit ip 192.168.108.0 0.0.0.255 172.17.0.0 0.0.255.255
+ deny   ip any any
+ip access-list extended OUTSIDE-TO-ROUTER-ACL
+ remark Timico-FortiGates
+ permit ip host 10.141.206.252 any
+ permit ip host 10.141.206.244 any
+ remark Timico-Monitoring
+ permit ip host 10.140.254.53 any
+ remark HTEC-NetworkConfigManager
+ permit ip host 192.168.106.52 any
+ permit icmp host 192.168.105.53 any
+ deny   ip any any
+ip access-list extended ROUTER-TO-OUTSIDE-ACL
+ remark Timico-TACACS
+ permit ip any host 10.140.254.200
+ remark Timico-Monitoring
+ permit ip any host 10.140.254.53
+ remark HTEC
+ permit ip any 192.168.21.192 0.0.0.31
+ permit ip any 192.168.21.224 0.0.0.31
+ permit ip any host 192.168.200.252
+ permit ip any host 192.168.200.254
+ permit ip any host 192.168.200.241
+ permit ip any host 192.168.200.246
+ deny   ip any any
+!
+logging trap notifications
+logging source-interface Dialer0
+logging host 192.168.21.205
+logging host 192.168.21.238
+dialer-list 1 protocol ip permit
+dialer-list 2 protocol ip permit
+!
+!
+snmp-server group timico v3 priv read timico 
+snmp-server view timico iso included
+snmp-server location 4127-BoltonFailover
+snmp-server contact Timico Technical Support
+snmp-server enable traps snmp authentication linkdown linkup coldstart warmstart
+snmp-server enable traps tty
+snmp-server enable traps config-copy
+snmp-server enable traps config
+snmp-server enable traps config-ctid
+snmp-server enable traps entity
+snmp-server enable traps cpu threshold
+snmp-server enable traps syslog
+snmp ifmib ifindex persist
+!
+tacacs server timico-tacacs
+ address ipv4 10.140.254.200
+ key FleafDunboCigejRes9Ryeksers
+ timeout 15
+!
+!
+!
+control-plane
+!
+banner motd ^C
+
+************************************************
+
+UNAUTHORIZED ACCESS TO THIS DEVICE IS PROHIBITED
+
+You must have explicit, authorized permission 
+
+to access or configure this device. 
+
+Unauthorized attempts and actions to access 
+
+or use this system may result in civil and/or 
+
+criminal penalties. All activities performed on 
+
+this device are logged and monitored.
+
+*************************************************
+
+^C
+!
+line con 0
+ exec-timeout 120 0
+ logging synchronous
+ transport input none
+ stopbits 1
+line vty 0 4
+ exec-timeout 120 0
+ logging synchronous
+ transport input ssh
+!
+ntp source Dialer0
+ntp server 192.168.21.202
+ntp server 192.168.21.234
+!
+!
+!
+!
+!
+end
